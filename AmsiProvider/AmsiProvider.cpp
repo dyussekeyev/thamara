@@ -1,12 +1,4 @@
-﻿#include <windows.h>
-#include <bcrypt.h>
-#include <ntstatus.h>
-#include <iostream>
-#include <string>
-#include <strsafe.h>
-#include <amsi.h>
-#include <wrl/module.h>
-#include "yara.h"
+﻿#include "AmsiProvider.h"
 
 using namespace Microsoft::WRL;
 
@@ -266,6 +258,8 @@ HRESULT ThamaraProvider::Scan(_In_ IAmsiStream* stream, _Out_ AMSI_RESULT* resul
 
     if (GL_found == true)
     {
+        GL_found = false;
+
         GetSystemTime(&st);
         swprintf_s(datetime, 200, L"%d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
@@ -302,7 +296,6 @@ finish:
         yr_compiler_destroy(compiler);
     }
     yr_finalize();
-
 
     return S_OK;
 }
