@@ -1,4 +1,12 @@
-﻿#include "pch.h"
+﻿#include <windows.h>
+#include <bcrypt.h>
+#include <ntstatus.h>
+#include <iostream>
+#include <string>
+#include <strsafe.h>
+#include <amsi.h>
+#include <wrl/module.h>
+#include "yara.h"
 
 using namespace Microsoft::WRL;
 
@@ -236,7 +244,7 @@ HRESULT ThamaraProvider::Scan(_In_ IAmsiStream* stream, _Out_ AMSI_RESULT* resul
     {
         goto finish;
     }
-    fd_rules = CreateFileW(L"C:\\amsi_thamara\\rules.yar", GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+    fd_rules = CreateFileW(L"C:\\ProgramData\\Thamara\\rules.yar", GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (fd_rules == INVALID_HANDLE_VALUE)
     {
         goto finish;
@@ -269,7 +277,7 @@ HRESULT ThamaraProvider::Scan(_In_ IAmsiStream* stream, _Out_ AMSI_RESULT* resul
             swprintf_s(logstring, 999, L"datetime=\"%s\" appName=\"%s\" contentName=\"%s\" rule_id=\"%s\" sha1=\"ERROR\"\r\n", datetime, appName.Get(), contentName.Get(), GL_rule_id);
         }
 
-        hFile = CreateFile(L"C:\\amsi_thamara\\string.log", FILE_APPEND_DATA, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        hFile = CreateFile(L"C:\\ProgramData\\Thamara\\amsi.log", FILE_APPEND_DATA, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile)
         {
             WriteFile(hFile, logstring, wcslen(logstring) * 2 + 2, NULL, NULL);
@@ -352,17 +360,17 @@ STDAPI DllRegisterServer()
     hr = SetKeyStringValue(HKEY_LOCAL_MACHINE, keyPath, L"ThreadingModel", L"Both");
     if (FAILED(hr)) return hr;
 
-    // x64
+#if defined (_WIN64)
     hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\Microsoft\\AMSI\\Providers\\%ls", clsidString);
     if (FAILED(hr)) return hr;
     hr = SetKeyStringValue(HKEY_LOCAL_MACHINE, keyPath, nullptr, L"ThamaraProvider");
     if (FAILED(hr)) return hr;
-
-    // x86
+#elif defined (_WIN32)
     hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\WOW6432Node\\Microsoft\\AMSI\\Providers\\%ls", clsidString);
     if (FAILED(hr)) return hr;
     hr = SetKeyStringValue(HKEY_LOCAL_MACHINE, keyPath, nullptr, L"ThamaraProvider");
     if (FAILED(hr)) return hr;
+#endif
 
     return S_OK;
 }
@@ -378,17 +386,17 @@ STDAPI DllUnregisterServer()
     // Unregister this CLSID as an anti-malware provider.
     wchar_t keyPath[200];
 
-    // x64
+#if defined (_WIN64)
     HRESULT hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\Microsoft\\AMSI\\Providers\\%ls", clsidString);
     if (FAILED(hr)) return hr;
     LONG status = RegDeleteTree(HKEY_LOCAL_MACHINE, keyPath);
     if (status != NO_ERROR && status != ERROR_PATH_NOT_FOUND) return HRESULT_FROM_WIN32(status);
-
-    // x86
-    hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\WOW6432Node\\Microsoft\\AMSI\\Providers\\%ls", clsidString);
+#elif defined (_WIN32)
+    HRESULT hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\WOW6432Node\\Microsoft\\AMSI\\Providers\\%ls", clsidString);
     if (FAILED(hr)) return hr;
-    status = RegDeleteTree(HKEY_LOCAL_MACHINE, keyPath);
+    LONG status = RegDeleteTree(HKEY_LOCAL_MACHINE, keyPath);
     if (status != NO_ERROR && status != ERROR_PATH_NOT_FOUND) return HRESULT_FROM_WIN32(status);
+#endif
 
     // Unregister this CLSID as a COM server.
     hr = StringCchPrintf(keyPath, ARRAYSIZE(keyPath), L"Software\\Classes\\CLSID\\%ls", clsidString);
