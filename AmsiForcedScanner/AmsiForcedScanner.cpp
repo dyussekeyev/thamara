@@ -20,21 +20,25 @@ BOOL Scan(PVOID buffer, ULONG length)
 
     hResult = AmsiInitialize(L"AmsiForcedScanner", &amsiContext);
     if (hResult != S_OK || amsiContext == NULL) {
+        OutputDebugStringW(L"AmsiForcedScanner - ERROR!\n");
         return FALSE;
     }
 
     hResult = AmsiOpenSession(amsiContext, &amsiSession);
     if (hResult != S_OK || amsiSession == NULL) {
+        OutputDebugStringW(L"AmsiOpenSession - ERROR!\n");
         return FALSE;
     }
 
     printf("p = %p, s = %d : ", buffer, length);
-    hResult = AmsiScanBuffer(amsiContext, buffer, length, L"", amsiSession, &amsiResult);
+    hResult = AmsiScanBuffer(amsiContext, buffer, length, L"System Memory", amsiSession, &amsiResult);
     printf("END!\n");
     if (hResult != S_OK) {
+        OutputDebugStringW(L"AmsiScanBuffer - ERROR!\n");
         return FALSE;
     }
 
+    AmsiCloseSession(amsiContext, amsiSession);
     AmsiUninitialize(amsiContext);
 
     return TRUE;
@@ -43,7 +47,7 @@ BOOL HookedReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBu
 {
     BOOL ret = TrueReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
     if (ret != 0) {
-        Scan((LPVOID) lpBaseAddress, nSize);
+        Scan((PVOID) lpBaseAddress, (ULONG) nSize);
     }
 
     return ret;
@@ -52,7 +56,7 @@ BOOL HookedWriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpB
 {
     BOOL ret = TrueWriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
     if (ret != 0) {
-        Scan((LPVOID) lpBuffer, nSize);
+        Scan((PVOID) lpBuffer, (ULONG) nSize);
     }
 
     return ret;
@@ -61,7 +65,7 @@ BOOL HookedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, P
 {
     BOOL ret = TrueVirtualProtect(lpAddress, dwSize, flNewProtect, lpflOldProtect);
     if (ret != 0) {
-        Scan(lpAddress, dwSize);
+        Scan((PVOID) lpAddress, (ULONG) dwSize);
     }
 
     return ret;
@@ -70,21 +74,21 @@ BOOL HookedVirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DW
 {
     BOOL ret = TrueVirtualProtectEx(hProcess, lpAddress, dwSize, flNewProtect, lpflOldProtect);
     if (ret != 0) {
-        Scan(lpAddress, dwSize);
+        Scan((PVOID) lpAddress, (ULONG) dwSize);
     }
 
     return ret;
 }
 BOOL HookedVirtualFree(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType)
 {
-    Scan(lpAddress, dwSize);
+    Scan((PVOID) lpAddress, (ULONG) dwSize);
     BOOL ret = TrueVirtualFree(lpAddress, dwSize, dwFreeType);
 
     return ret;
 }
 BOOL HookedVirtualFreeEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType)
 {
-    Scan(lpAddress, dwSize);
+    Scan((PVOID) lpAddress, (ULONG) dwSize);
     BOOL ret = TrueVirtualFreeEx(hProcess, lpAddress, dwSize, dwFreeType);
 
     return ret;

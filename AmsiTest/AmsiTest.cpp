@@ -12,7 +12,7 @@ BOOL Scan(PVOID buffer, ULONG length)
 	ZeroMemory(&amsiContext, sizeof(amsiContext));
 	ZeroMemory(&amsiSession, sizeof(amsiSession));
 
-	hResult = AmsiInitialize(L"AmsiForcedScanner", &amsiContext);
+	hResult = AmsiInitialize(L"AmsiTest", &amsiContext);
 	if (hResult != S_OK || amsiContext == NULL) {
 		return FALSE;
 	}
@@ -22,11 +22,12 @@ BOOL Scan(PVOID buffer, ULONG length)
 		return FALSE;
 	}
 
-	hResult = AmsiScanBuffer(amsiContext, buffer, length, L"Amsi Test Native", amsiSession, &amsiResult);
+	hResult = AmsiScanBuffer(amsiContext, buffer, length, L"Native Amsi Test", amsiSession, &amsiResult);
 	if (hResult != S_OK) {
 		return FALSE;
 	}
 
+	AmsiCloseSession(amsiContext, amsiSession);
 	AmsiUninitialize(amsiContext);
 
 	return TRUE;
@@ -40,6 +41,13 @@ int main()
 	DWORD flOldProtect;
 	size_t NumberOfBytesRead;
 
+	// LoadLibrary
+#if defined (_WIN64)
+	LoadLibraryW(L"AmsiForcedScanner64.dll");
+#elif defined (_WIN32)
+	LoadLibraryW(L"AmsiForcedScanner32.dll");
+#endif
+	/*
 	// create new mem 1
 	pmem = (PBYTE) VirtualAlloc(NULL, binary_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if (pmem == NULL)
@@ -144,6 +152,7 @@ int main()
 	{
 		printf("VirtualFreeEx - OK! Size = %d, Ptr = %p\n", binary_size, pmemex);
 	}
+	*/
 
 	return 0;
 }
