@@ -93,6 +93,7 @@
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
       <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
       <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
+      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,6 +123,7 @@
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
       <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
       <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
+      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -147,6 +149,7 @@
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
       <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
       <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
+      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -176,6 +179,7 @@
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
       <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
       <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
+      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿#include "AmsiForcedScanner.h"
+#include <stdio.h>
 
 static BOOL (WINAPI * TrueReadProcessMemory)(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead) = ReadProcessMemory;
 static BOOL (WINAPI * TrueWriteProcessMemory)(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten) = WriteProcessMemory;
@@ -12,19 +13,24 @@ BOOL Scan(PVOID buffer, ULONG length)
     HRESULT hResult = NULL;
     HAMSICONTEXT amsiContext = NULL;
     HAMSISESSION amsiSession = NULL;
-    AMSI_RESULT amsiResult = AMSI_RESULT_DETECTED;
+    AMSI_RESULT amsiResult = AMSI_RESULT_CLEAN;
+
+    ZeroMemory(&amsiContext, sizeof(amsiContext));
+    ZeroMemory(&amsiSession, sizeof(amsiSession));
 
     hResult = AmsiInitialize(L"AmsiForcedScanner", &amsiContext);
-    if (hResult != S_OK) {
+    if (hResult != S_OK || amsiContext == NULL) {
         return FALSE;
     }
 
     hResult = AmsiOpenSession(amsiContext, &amsiSession);
-    if (hResult != S_OK) {
+    if (hResult != S_OK || amsiSession == NULL) {
         return FALSE;
     }
 
-    hResult = AmsiScanBuffer(amsiContext, buffer, length, L"system memory", amsiSession, &amsiResult);
+    printf("p = %p, s = %d : ", buffer, length);
+    hResult = AmsiScanBuffer(amsiContext, buffer, length, L"", amsiSession, &amsiResult);
+    printf("END!\n");
     if (hResult != S_OK) {
         return FALSE;
     }
@@ -84,6 +90,10 @@ BOOL HookedVirtualFreeEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD
     return ret;
 }
 
+int Init()
+{
+    return 0;
+}
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
