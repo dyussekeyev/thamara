@@ -15,6 +15,13 @@ BOOL Scan(PVOID buffer, ULONG length)
     HAMSISESSION amsiSession = NULL;
     AMSI_RESULT amsiResult = AMSI_RESULT_CLEAN;
 
+    printf("len = %d\n", length);
+    if (length < 32)
+    {
+        return TRUE;
+    }
+    printf("LEN IS OK %d\n", length);
+
     ZeroMemory(&amsiContext, sizeof(amsiContext));
     ZeroMemory(&amsiSession, sizeof(amsiSession));
 
