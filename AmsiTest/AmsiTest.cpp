@@ -47,7 +47,7 @@ int main()
 #elif defined (_WIN32)
 	LoadLibraryW(L"AmsiForcedScanner32.dll");
 #endif
-	/*
+	
 	// create new mem 1
 	pmem = (PBYTE) VirtualAlloc(NULL, binary_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if (pmem == NULL)
@@ -75,9 +75,10 @@ int main()
 	// copy to new memory
 	CopyMemory(pmem, binary, binary_size);
 	CopyMemory(pmemex, binary, binary_size);
+	printf("CopyMemory!\n");
 
 	// VirtualProtect
-	if ((VirtualProtect(pmem, binary_size, PAGE_READWRITE, &flOldProtect) == NULL))
+	if ((VirtualProtect(pmem, binary_size, PAGE_EXECUTE_READWRITE, &flOldProtect) == NULL))
 	{
 		printf("VirtualProtect - Error!\n");
 		return 1;
@@ -88,7 +89,7 @@ int main()
 	}
 
 	// VirtualProtectEx
-	if ((VirtualProtectEx(GetCurrentProcess(), pmemex, binary_size, PAGE_READWRITE, &flOldProtect) == NULL))
+	if ((VirtualProtectEx(GetCurrentProcess(), pmemex, binary_size, PAGE_EXECUTE_READWRITE, &flOldProtect) == NULL))
 	{
 		printf("VirtualProtectEx - Error!\n");
 		return 1;
@@ -152,7 +153,6 @@ int main()
 	{
 		printf("VirtualFreeEx - OK! Size = %d, Ptr = %p\n", binary_size, pmemex);
 	}
-	*/
 
 	return 0;
 }
