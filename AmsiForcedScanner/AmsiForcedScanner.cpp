@@ -1,15 +1,51 @@
 ﻿#include "AmsiForcedScanner.h"
 #include <stdio.h>
 
-static BOOL (WINAPI * TrueReadProcessMemory)(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead) = ReadProcessMemory;
-static BOOL (WINAPI * TrueWriteProcessMemory)(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten) = WriteProcessMemory;
-static BOOL (WINAPI * TrueVirtualFree)(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType) = VirtualFree;
-static BOOL (WINAPI * TrueVirtualFreeEx)(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType) = VirtualFreeEx;
+BOOL ScanBuffer(PVOID buffer, ULONG length, LPCWSTR contentName)
+{
+    HRESULT hResult = NULL;
+    HAMSICONTEXT amsiContext = NULL;
+    HAMSISESSION amsiSession = NULL;
+    AMSI_RESULT amsiResult = AMSI_RESULT_CLEAN;
+    WCHAR appName[MAX_PATH];
 
-void Attach();
-void Detach();
+    if (GetModuleFileNameW(NULL, appName, MAX_PATH) == 0)
+    {
+        OutputDebugStringW(L"GetModuleFileNameW - ERROR!\n");
+        return FALSE;
+    }
 
-BOOL Scan(PVOID buffer, ULONG length, LPCWSTR contentName)
+    ZeroMemory(&amsiContext, sizeof(amsiContext));
+    ZeroMemory(&amsiSession, sizeof(amsiSession));
+
+    hResult = AmsiInitialize(appName, &amsiContext);
+    if (hResult != S_OK || amsiContext == NULL)
+    {
+        OutputDebugStringW(L"AmsiForcedScanner - ERROR!\n");
+        return FALSE;
+    }
+
+    hResult = AmsiOpenSession(amsiContext, &amsiSession);
+    if (hResult != S_OK || amsiSession == NULL)
+    {
+        OutputDebugStringW(L"AmsiOpenSession - ERROR!\n");
+        return FALSE;
+    }
+
+    hResult = AmsiScanBuffer(amsiContext, buffer, length, contentName, amsiSession, &amsiResult);
+    if (hResult != S_OK)
+    {
+        OutputDebugStringW(L"AmsiScanBuffer - ERROR!\n");
+        return FALSE;
+    }
+
+    AmsiCloseSession(amsiContext, amsiSession);
+    AmsiUninitialize(amsiContext);
+
+    return TRUE;
+}
+
+BOOL ScanString(LPCWSTR string, LPCWSTR contentName)
 {
     HRESULT hResult = NULL;
     HAMSICONTEXT amsiContext = NULL;
@@ -20,22 +56,23 @@ BOOL Scan(PVOID buffer, ULONG length, LPCWSTR contentName)
     ZeroMemory(&amsiSession, sizeof(amsiSession));
 
     hResult = AmsiInitialize(L"AmsiForcedScanner", &amsiContext);
-    if (hResult != S_OK || amsiContext == NULL) {
+    if (hResult != S_OK || amsiContext == NULL)
+    {
         OutputDebugStringW(L"AmsiForcedScanner - ERROR!\n");
         return FALSE;
     }
 
     hResult = AmsiOpenSession(amsiContext, &amsiSession);
-    if (hResult != S_OK || amsiSession == NULL) {
+    if (hResult != S_OK || amsiSession == NULL)
+    {
         OutputDebugStringW(L"AmsiOpenSession - ERROR!\n");
         return FALSE;
     }
 
-    printf("p = %p, s = %d : ", buffer, length);
-    hResult = AmsiScanBuffer(amsiContext, buffer, length, contentName, amsiSession, &amsiResult);
-    printf("END!\n");
-    if (hResult != S_OK) {
-        OutputDebugStringW(L"AmsiScanBuffer - ERROR!\n");
+    hResult = AmsiScanString(amsiContext, string, contentName, amsiSession, &amsiResult);
+    if (hResult != S_OK)
+    {
+        OutputDebugStringW(L"AmsiScanString - ERROR!\n");
         return FALSE;
     }
 
@@ -56,101 +93,119 @@ BOOL CheckRead(LPVOID lpAddress)
 
         switch (dwProtect)
         {
-            printf("\nswitch = %x\n", dwProtect);
-
             case PAGE_EXECUTE_READ:
                 return TRUE;
                 break;
             case PAGE_EXECUTE_READWRITE:
                 return TRUE;
                 break;
+            case PAGE_READONLY:
+                return TRUE;
+                break;
+            case PAGE_READWRITE:
+                return TRUE;
+                break;
+            default:
+                return FALSE;
         }
     }
 
     return FALSE;
 }
 
-BOOL HookedReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
+BOOL GetVirtualSize(LPVOID lpAddress)
 {
-    printf("HookedReadProcessMemory %d\n", nSize);
-    BOOL ret = TrueReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
-    if (ret != 0) {
-        Detach();
-        Scan((PVOID)lpBaseAddress, (ULONG)nSize, L"ReadProcessMemory");
-        Attach();
+    MEMORY_BASIC_INFORMATION MemoryBasicInformation;
+    SIZE_T RegionSize = 0;
 
-    }
-
-    return ret;
-}
-
-BOOL HookedWriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten)
-{
-    printf("HookedWriteProcessMemory %d\n", nSize);
-    BOOL ret = TrueWriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
-    if (ret != 0) {
-        Detach();
-        Scan((PVOID)lpBaseAddress, (ULONG)nSize, L"WriteProcessMemory");
-        Attach();
-    }
-
-    return ret;
-}
-
-BOOL HookedVirtualFree(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType)
-{
-    if (CheckRead(lpAddress))
+    if (VirtualQuery(lpAddress, &MemoryBasicInformation, sizeof(MemoryBasicInformation)) != 0)
     {
-        printf("HookedVirtualFree %d\n", dwSize);
-        Detach();
-        Scan((PVOID)lpAddress, (ULONG)dwSize, L"VirtualFree");
-        Attach();
+        RegionSize = MemoryBasicInformation.RegionSize;
     }
 
-    BOOL ret = TrueVirtualFree(lpAddress, dwSize, dwFreeType);
-
-    return ret;
+    return RegionSize;
 }
 
-BOOL HookedVirtualFreeEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType)
+NTSTATUS HookedNtWriteVirtualMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten)
 {
-    if (CheckRead(lpAddress))
-    {
-        printf("HookedVirtualFreeEx %d\n", dwSize);
-        Detach();
-        Scan((PVOID)lpAddress, (ULONG)dwSize, L"VirtualFreeEx");
-        Attach();
-    }
+    NTSTATUS ret = TrueNtWriteVirtualMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
+    CHAR DbgMsg[1024];
 
-    BOOL ret = TrueVirtualFreeEx(hProcess, lpAddress, dwSize, dwFreeType);
+    if (ret == 0)
+    {
+        if (CheckRead((LPVOID) lpBuffer))
+        {
+            sprintf_s(DbgMsg, 1023, "HookedNtWriteVirtualMemory: nSize = %d\n", nSize);
+            OutputDebugStringA(DbgMsg);
+            ScanBuffer((PVOID) lpBuffer, (ULONG) nSize, L"NtWriteVirtualMemory");
+        }
+    }
 
     return ret;
 }
+
+NTSTATUS HookedNtReadVirtualMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
+{
+    NTSTATUS ret = TrueNtReadVirtualMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
+    CHAR DbgMsg[1024];
+
+    if (ret == 0)
+    {
+        if (CheckRead((LPVOID) lpBaseAddress))
+        {
+            sprintf_s(DbgMsg, 1023, "HookedNtReadVirtualMemory: nSize = %d\n", nSize);
+            OutputDebugStringA(DbgMsg);
+
+            ScanBuffer((PVOID) lpBaseAddress, (ULONG) nSize, L"NtReadVirtualMemory");
+        }
+    }
+
+    return ret;
+}
+
+NTSTATUS HookedRtlDecompressBuffer(USHORT CompressionFormat, PUCHAR UncompressedBuffer, ULONG UncompressedBufferSize, PUCHAR CompressedBuffer, ULONG CompressedBufferSize, PULONG FinalUncompressedSize)
+{
+    NTSTATUS ret = TrueRtlDecompressBuffer(CompressionFormat, UncompressedBuffer, UncompressedBufferSize, CompressedBuffer, CompressedBufferSize, FinalUncompressedSize);
+    CHAR DbgMsg[1024];
+
+    if (ret == 0)
+    {
+        sprintf_s(DbgMsg, 1023, "HookedRtlDecompressBuffer: *FinalUncompressedSize = %d\n", *FinalUncompressedSize);
+        OutputDebugStringA(DbgMsg);
+
+        ScanBuffer((PVOID) UncompressedBuffer, *FinalUncompressedSize, L"RtlDecompressBuffer");
+    }
+
+    return ret;
+}
+
+NTSTATUS HookedRtlCompressBuffer(USHORT CompressionFormatAndEngine, PUCHAR UncompressedBuffer, ULONG UncompressedBufferSize, PUCHAR CompressedBuffer, ULONG CompressedBufferSize, ULONG UncompressedChunkSize, PULONG FinalCompressedSize, PVOID WorkSpace)
+{
+    NTSTATUS ret = TrueRtlCompressBuffer(CompressionFormatAndEngine, UncompressedBuffer, UncompressedBufferSize, CompressedBuffer, CompressedBufferSize, UncompressedChunkSize, FinalCompressedSize, WorkSpace);
+    CHAR DbgMsg[1024];
+
+    if (ret == 0)
+    {
+        sprintf_s(DbgMsg, 1023, "HookedRtlCompressBuffer: UncompressedBufferSize = %d\n", UncompressedBufferSize);
+        OutputDebugStringA(DbgMsg);
+
+        ScanBuffer((PVOID) UncompressedBuffer, UncompressedBufferSize, L"RtlCompressBuffer");
+    }
+
+    return ret;
+}
+
+
 
 int Init()
 {
     return 0;
 }
 
-void Attach()
-{
-    DetourAttach(&(PVOID&)TrueReadProcessMemory, HookedReadProcessMemory);
-    DetourAttach(&(PVOID&)TrueWriteProcessMemory, HookedWriteProcessMemory);
-    DetourAttach(&(PVOID&)TrueVirtualFree, HookedVirtualFree);
-    DetourAttach(&(PVOID&)TrueVirtualFreeEx, HookedVirtualFreeEx);
-}
-
-void Detach()
-{
-    DetourDetach(&(PVOID&)TrueReadProcessMemory, HookedReadProcessMemory);
-    DetourDetach(&(PVOID&)TrueWriteProcessMemory, HookedWriteProcessMemory);
-    DetourDetach(&(PVOID&)TrueVirtualFree, HookedVirtualFree);
-    DetourDetach(&(PVOID&)TrueVirtualFreeEx, HookedVirtualFreeEx);
-}
-
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    if (DetourIsHelperProcess()) {
+    if (DetourIsHelperProcess())
+    {
         return TRUE;
     }
 
@@ -160,13 +215,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         DetourRestoreAfterWith();
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
-        Attach();
+        DetourAttach(&(PVOID&)TrueNtWriteVirtualMemory, HookedNtWriteVirtualMemory);
+        DetourAttach(&(PVOID&)TrueNtReadVirtualMemory, HookedNtReadVirtualMemory);
+        DetourAttach(&(PVOID&)TrueRtlDecompressBuffer, HookedRtlDecompressBuffer);
+        DetourAttach(&(PVOID&)TrueRtlCompressBuffer, HookedRtlCompressBuffer);
         DetourTransactionCommit();
         break;
     case DLL_PROCESS_DETACH:
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
-        Detach();
+        DetourDetach(&(PVOID&)TrueNtWriteVirtualMemory, HookedNtWriteVirtualMemory);
+        DetourDetach(&(PVOID&)TrueNtReadVirtualMemory, HookedNtReadVirtualMemory);
+        DetourDetach(&(PVOID&)TrueRtlDecompressBuffer, HookedRtlDecompressBuffer);
+        DetourDetach(&(PVOID&)TrueRtlCompressBuffer, HookedRtlCompressBuffer);
         DetourTransactionCommit();
         break;
     }

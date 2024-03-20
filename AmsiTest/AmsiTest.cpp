@@ -132,6 +132,40 @@ int main()
 		printf("Check AMSI - OK!\n");
 	}
 
+	// RtlCompressBuffer
+	ULONG FinalCompressedSize;
+	MEMORY_BASIC_INFORMATION MemoryBasicInformation;
+	ULONG CompressBufferWorkSpaceSize;
+	ULONG CompressFragmentWorkSpaceSize;
+
+	VirtualQuery(pmemex, &MemoryBasicInformation, sizeof(MemoryBasicInformation));
+	RtlGetCompressionWorkSpaceSize(COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM, &CompressBufferWorkSpaceSize, &CompressFragmentWorkSpaceSize);
+	PVOID WorkSpace = malloc(CompressBufferWorkSpaceSize);
+
+	if (RtlCompressBuffer(COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM, (PUCHAR) binary, sizeof(binary), pmemex, MemoryBasicInformation.RegionSize, 4096, &FinalCompressedSize, WorkSpace))
+	{
+		printf("RtlCompressBuffer - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("RtlCompressBuffer - OK! UncompressedBufferSize = %d, FinalCompressedSize = %d\n", sizeof(binary), FinalCompressedSize);
+	}
+
+	// RtlDecompressBuffer
+	ULONG FinalUncompressedSize;
+	VirtualQuery(pmem, &MemoryBasicInformation, sizeof(MemoryBasicInformation));
+
+	if (RtlDecompressBuffer(COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM, pmem, MemoryBasicInformation.RegionSize, pmemex, FinalCompressedSize, &FinalUncompressedSize))
+	{
+		printf("RtlDecompressBuffer - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("RtlDecompressBuffer - OK! CompressedBufferSize = %d, FinalUncompressedSize = %d\n", FinalCompressedSize, FinalUncompressedSize);
+	}
+
 	// VirtualFree
 	if ((VirtualFree(pmem, 0, MEM_RELEASE) == NULL))
 	{

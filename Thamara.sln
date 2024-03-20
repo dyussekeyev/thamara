@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmsiProvider", "AmsiProvider\AmsiProvider.vcxproj", "{74B3CBA8-EE04-48F6-8785-364C6993C39A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmsiForcedScanner", "AmsiForcedScanner\AmsiForcedScanner.vcxproj", "{D567B239-EC91-410D-B785-032357D36E55}"
-	ProjectSection(ProjectDependencies) = postProject
-		{74B3CBA8-EE04-48F6-8785-364C6993C39A} = {74B3CBA8-EE04-48F6-8785-364C6993C39A}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmsiTest", "AmsiTest\AmsiTest.vcxproj", "{4B230DBE-7B3B-495D-A4D0-CCBDE8EC9F88}"
 EndProject

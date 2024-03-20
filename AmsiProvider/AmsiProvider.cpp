@@ -274,7 +274,7 @@ HRESULT ThamaraProvider::Scan(_In_ IAmsiStream* stream, _Out_ AMSI_RESULT* resul
         hFile = CreateFile(L"C:\\ProgramData\\Thamara\\amsi.log", FILE_APPEND_DATA, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile)
         {
-            WriteFile(hFile, logstring, wcslen(logstring) * 2 + 2, NULL, NULL);
+            WriteFile(hFile, logstring, wcslen(logstring) * 2, NULL, NULL);
         }
     }
 
