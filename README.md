@@ -14,15 +14,34 @@ That's why forced scanning might help improve system security. This method is im
 
 THAMARA consists of several components:
 
-1. AmsiScanner - DLL that is implemented as the provider of the antimalware product (see also [IAntimalwareProvider](https://learn.microsoft.com/en-us/windows/win32/api/amsi/nn-amsi-iantimalwareprovider)).
+1. **AmsiScanner** - DLL that is implemented as the provider of the antimalware product (see also [IAntimalwareProvider](https://learn.microsoft.com/en-us/windows/win32/api/amsi/nn-amsi-iantimalwareprovider)). The buffers/blobs are scanned using the [YARA](https://github.com/VirusTotal/yara) static library.
 
-2. AmsiForcedScanner - DLL is to be injected into the monitored process to intercept the certification of the WinAPI function and forward transmitted data into AmsiScanner. The hooking capabilities are provided by the [Microsoft Detours](https://github.com/microsoft/Detours) static library. The list of hooked functions is below.
+     Rules are stored in the following file:
 
-3. AmsiInjector - executable that enumerates existing processes and injects AmsiForcedScanner into each (in progress).
+     ```
+     C:\ProgramData\Thamara\rules.yar
+     ```
 
-4. AmsiTest - executable that provides testing of compiled libraries.
+     The following file stores detections:
 
-## Building and Installation
+     ```
+     C:\ProgramData\Thamara\amsi.log
+     ```
+
+3. **AmsiForcedScanner** - DLL is to be injected into the monitored process to intercept the certification of the WinAPI function and forward transmitted data into AmsiScanner. The hooking capabilities are provided by the [Microsoft Detours](https://github.com/microsoft/Detours) static library. The list of hooked functions is below:
+
+     ```
+     NtWriteVirtualMemory
+     NtReadVirtualMemory
+     RtlDecompressBuffer
+     RtlCompressBuffer
+     ```
+
+4. **AmsiInjector** - executable that enumerates existing processes and injects AmsiForcedScanner into each (in progress).
+
+5. **AmsiTest** - executable that provides testing of compiled libraries.
+
+## Installation
 
 1. Use Microsoft Visual Studio 2022 to build the solution.
 
@@ -67,17 +86,33 @@ THAMARA consists of several components:
 
 6. Start **AmsiTest.exe**
 
-7. Open using the **Notepad** following file:
+7. Open using a **text viewer/editor** the following file:
 
      ```
      C:\ProgramData\Thamara\amsi.log
      ```
 
-8. Disable AMSI Provided using following command with administrator privileges:
+     You should see something like this:
+
+     ```
+     datetime="2024.03.20 20:11:30.660" appName="C:\ProgramData\Thamara\AmsiTest.exe" contentName="NtReadVirtualMemory (forced)" rule_id="AmsiTestRule" sha1="efb3d4fed013c67e11c97f5edbd8e116eef8e0ef"
+     datetime="2024.03.20 20:11:30.672" appName="C:\ProgramData\Thamara\AmsiTest.exe" contentName="NtWriteVirtualMemory (forced)" rule_id="AmsiTestRule" sha1="efb3d4fed013c67e11c97f5edbd8e116eef8e0ef"
+     datetime="2024.03.20 20:11:30.678" appName="AmsiTest" contentName="Native Amsi Test" rule_id="AmsiTestRule" sha1="efb3d4fed013c67e11c97f5edbd8e116eef8e0ef"
+     datetime="2024.03.20 20:11:30.684" appName="C:\ProgramData\Thamara\AmsiTest.exe" contentName="RtlCompressBuffer (forced)" rule_id="AmsiTestRule" sha1="efb3d4fed013c67e11c97f5edbd8e116eef8e0ef"
+     datetime="2024.03.20 20:11:30.689" appName="C:\ProgramData\Thamara\AmsiTest.exe" contentName="RtlDecompressBuffer (forced)" rule_id="AmsiTestRule" sha1="efb3d4fed013c67e11c97f5edbd8e116eef8e0ef"
+     ```
+     
+9. Disable AMSI Provider using following command with administrator privileges:
 
      ```
      regsvr32 /u C:\ProgramData\Thamara\AmsiProvider64.dll
      ```
+
+## Contributing
+
+The best way you may contribute is to test software and suggest feature requests.
+
+Please feel free to open an issue for discussing the changes.
 
 ## License
 
