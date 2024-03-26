@@ -41,6 +41,12 @@ THAMARA consists of several components:
 
 5. **AmsiTest** - executable that provides testing of compiled libraries.
 
+## Demo
+
+### First Early Demo
+
+[![THAMARA - First Early Demo](https://img.youtube.com/vi/Eh9EsSAsQEA/hqdefault.jpg)](https://www.youtube.com/watch?v=Eh9EsSAsQEA)
+
 ## Installation
 
 1. Use Microsoft Visual Studio 2022 to build the solution.
