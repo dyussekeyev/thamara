@@ -1,4 +1,4 @@
-﻿#include "AmsiProvider.h"
+﻿#include "ThamaraProvider.h"
 
 using namespace Microsoft::WRL;
 

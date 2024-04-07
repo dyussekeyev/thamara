@@ -22,8 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{4b230dbe-7b3b-495d-a4d0-ccbde8ec9f88}</ProjectGuid>
-    <RootNamespace>AmsiTest</RootNamespace>
+    <RootNamespace>ThamaraTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ThamaraTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -131,10 +132,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AmsiTest.cpp" />
+    <ClCompile Include="ThamaraTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AmsiTest.h" />
+    <ClInclude Include="ThamaraTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

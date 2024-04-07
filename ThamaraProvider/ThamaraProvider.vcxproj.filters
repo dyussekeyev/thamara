@@ -165,12 +165,12 @@
     <ClInclude Include="yara_utils.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="AmsiProvider.h">
+    <ClInclude Include="ThamaraProvider.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AmsiProvider.cpp">
+    <ClCompile Include="ThamaraProvider.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

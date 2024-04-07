@@ -1,4 +1,4 @@
-﻿#include "AmsiTest.h"
+﻿#include "ThamaraTest.h"
 
 const unsigned char binary[] = { 0xFE, 0xED, 0xBA, 0xBE, 0xDE, 0xAD, 0xC0, 0xDE, 0xFA, 0xCE, 0xB0, 0x0C };
 
@@ -37,9 +37,9 @@ int main()
 {
 	PBYTE pmem = NULL;
 	PBYTE pmemex = NULL;
-	size_t binary_size = sizeof(binary);
+	SIZE_T binary_size = sizeof(binary);
 	DWORD flOldProtect;
-	size_t NumberOfBytesRead;
+	SIZE_T NumberOfBytesRead;
 
 	// LoadLibrary
 #if defined (_WIN64)

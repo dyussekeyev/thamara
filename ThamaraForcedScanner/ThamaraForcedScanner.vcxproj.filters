@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AmsiForcedScanner.h">
+    <ClInclude Include="ThamaraForcedScanner.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="detours.h">
@@ -23,7 +23,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AmsiForcedScanner.cpp">
+    <ClCompile Include="ThamaraForcedScanner.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

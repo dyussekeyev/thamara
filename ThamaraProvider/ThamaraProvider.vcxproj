@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d567b239-ec91-410d-b785-032357d36e55}</ProjectGuid>
-    <RootNamespace>AmsiForcedScanner</RootNamespace>
+    <ProjectGuid>{74b3cba8-ee04-48f6-8785-364c6993c39a}</ProjectGuid>
+    <RootNamespace>ThamaraProvider</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ThamaraProvider</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,26 +75,24 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;AMSIFORCEDSCANNER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;THAMARAPROVIDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile />
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>kernel32.lib;windowsapp.lib;bcrypt.lib;libyara$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ThamaraProvider.def</ModuleDefinitionFile>
       <OutputFile>$(OutDir)$(TargetName)$(PlatformArchitecture)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>detours$(PlatformArchitecture)\detours.lib;amsi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)$(PlatformArchitecture).pdb</ProgramDatabaseFile>
+      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
-      <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
-      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,13 +101,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;AMSIFORCEDSCANNER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;THAMARAPROVIDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile />
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,40 +115,36 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>kernel32.lib;windowsapp.lib;bcrypt.lib;libyara$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ThamaraProvider.def</ModuleDefinitionFile>
       <OutputFile>$(OutDir)$(TargetName)$(PlatformArchitecture)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>detours$(PlatformArchitecture)\detours.lib;amsi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)$(PlatformArchitecture).pdb</ProgramDatabaseFile>
+      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
-      <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
-      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;AMSIFORCEDSCANNER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;THAMARAPROVIDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile />
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>kernel32.lib;windowsapp.lib;bcrypt.lib;libyara$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ThamaraProvider.def</ModuleDefinitionFile>
       <OutputFile>$(OutDir)$(TargetName)$(PlatformArchitecture)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>detours$(PlatformArchitecture)\detours.lib;amsi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)$(PlatformArchitecture).pdb</ProgramDatabaseFile>
+      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
-      <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
-      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,13 +153,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;AMSIFORCEDSCANNER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;THAMARAPROVIDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile />
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,22 +167,69 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>kernel32.lib;windowsapp.lib;bcrypt.lib;libyara$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ThamaraProvider.def</ModuleDefinitionFile>
       <OutputFile>$(OutDir)$(TargetName)$(PlatformArchitecture)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>detours$(PlatformArchitecture)\detours.lib;amsi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)$(PlatformArchitecture).pdb</ProgramDatabaseFile>
+      <ManifestFile>$(IntDir)$(TargetName)$(PlatformArchitecture)$(TargetExt).intermediate.manifest</ManifestFile>
       <ImportLibrary>$(OutDir)$(TargetName)$(PlatformArchitecture).lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)$(TargetName)$(PlatformArchitecture).pgd</ProfileGuidedDatabase>
-      <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName)$(PlatformArchitecture).iobj</LinkTimeCodeGenerationObjectFile>
-      <ModuleDefinitionFile>AmsiForcedScanner.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="detours.h" />
-    <ClInclude Include="AmsiForcedScanner.h" />
+    <ClInclude Include="ThamaraProvider.h" />
+    <ClInclude Include="test_util.h" />
+    <ClInclude Include="yara.h" />
+    <ClInclude Include="yara_ahocorasick.h" />
+    <ClInclude Include="yara_arena.h" />
+    <ClInclude Include="yara_atoms.h" />
+    <ClInclude Include="yara_authenticode.h" />
+    <ClInclude Include="yara_base64.h" />
+    <ClInclude Include="yara_bitmask.h" />
+    <ClInclude Include="yara_compiler.h" />
+    <ClInclude Include="yara_dex.h" />
+    <ClInclude Include="yara_dotnet.h" />
+    <ClInclude Include="yara_elf.h" />
+    <ClInclude Include="yara_elf_utils.h" />
+    <ClInclude Include="yara_endian.h" />
+    <ClInclude Include="yara_error.h" />
+    <ClInclude Include="yara_exec.h" />
+    <ClInclude Include="yara_exefiles.h" />
+    <ClInclude Include="yara_filemap.h" />
+    <ClInclude Include="yara_globals.h" />
+    <ClInclude Include="yara_hash.h" />
+    <ClInclude Include="yara_hex_lexer.h" />
+    <ClInclude Include="yara_integers.h" />
+    <ClInclude Include="yara_lexer.h" />
+    <ClInclude Include="yara_libyara.h" />
+    <ClInclude Include="yara_limits.h" />
+    <ClInclude Include="yara_macho.h" />
+    <ClInclude Include="yara_mem.h" />
+    <ClInclude Include="yara_modules.h" />
+    <ClInclude Include="yara_notebook.h" />
+    <ClInclude Include="yara_object.h" />
+    <ClInclude Include="yara_parser.h" />
+    <ClInclude Include="yara_pe.h" />
+    <ClInclude Include="yara_pe_utils.h" />
+    <ClInclude Include="yara_proc.h" />
+    <ClInclude Include="yara_re.h" />
+    <ClInclude Include="yara_re_lexer.h" />
+    <ClInclude Include="yara_rules.h" />
+    <ClInclude Include="yara_scan.h" />
+    <ClInclude Include="yara_scanner.h" />
+    <ClInclude Include="yara_simple_str.h" />
+    <ClInclude Include="yara_sizedstr.h" />
+    <ClInclude Include="yara_stack.h" />
+    <ClInclude Include="yara_stopwatch.h" />
+    <ClInclude Include="yara_stream.h" />
+    <ClInclude Include="yara_strutils.h" />
+    <ClInclude Include="yara_threading.h" />
+    <ClInclude Include="yara_tlsh.h" />
+    <ClInclude Include="yara_types.h" />
+    <ClInclude Include="yara_unaligned.h" />
+    <ClInclude Include="yara_utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AmsiForcedScanner.cpp" />
+    <ClCompile Include="ThamaraProvider.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

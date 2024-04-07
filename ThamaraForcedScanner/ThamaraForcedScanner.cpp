@@ -1,4 +1,4 @@
-﻿#include "AmsiForcedScanner.h"
+﻿#include "ThamaraForcedScanner.h"
 #include <stdio.h>
 
 BOOL ScanBuffer(PVOID buffer, ULONG length, LPCWSTR contentName)
@@ -194,8 +194,6 @@ NTSTATUS HookedRtlCompressBuffer(USHORT CompressionFormatAndEngine, PUCHAR Uncom
 
     return ret;
 }
-
-
 
 int Init()
 {
