@@ -33,13 +33,20 @@ BOOL Scan(PVOID buffer, ULONG length)
 	return TRUE;
 }
 
-int main()
+int main(int argc, const char* argv[])
 {
 	PBYTE pmem = NULL;
 	PBYTE pmemex = NULL;
 	SIZE_T binary_size = sizeof(binary);
 	DWORD flOldProtect;
 	SIZE_T NumberOfBytesRead;
+
+	// check number of parameters
+	if (argc < 3)
+	{
+		printf("Help: ThamaraTest.exe <pid> <dll>\n");
+		return 1;
+	}
 
 	// LoadLibrary
 #if defined (_WIN64)
@@ -174,7 +181,7 @@ int main()
 	}
 	else
 	{
-		printf("VirtualFree - OK! Size = %d, Ptr = %p\n", binary_size, pmem);
+		printf("VirtualFree - OK! Size = %d, Ptr = %p\n", (int)binary_size, pmem);
 	}
 
 	// VirtualFreeEx
@@ -185,8 +192,58 @@ int main()
 	}
 	else
 	{
-		printf("VirtualFreeEx - OK! Size = %d, Ptr = %p\n", binary_size, pmemex);
+		printf("VirtualFreeEx - OK! Size = %d, Ptr = %p\n", (int)binary_size, pmemex);
 	}
+
+	// Injector
+	int pid = atoi(argv[1]);
+
+	HANDLE hProcess = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD, FALSE, pid);
+	if (hProcess == NULL)
+	{
+		printf("OpenProcess - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("OpenProcess - OK! handle process = %p\n", hProcess);
+	}
+
+	LPVOID lpmem = VirtualAllocEx(hProcess, NULL, 4096, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if (lpmem == NULL)
+	{
+		printf("VirtualAllocEx - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("VirtualAllocEx - OK! lpmem = %p\n", lpmem);
+	}
+
+	if (WriteProcessMemory(hProcess, lpmem, argv[2], strlen(argv[2])+1, NULL) == 0)
+	{
+		printf("WriteProcessMemory - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("WriteProcessMemory - OK!\n");
+	}
+
+	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE) GetProcAddress(GetModuleHandle(L"kernel32.dll"), "LoadLibraryA"), lpmem, 0, NULL);
+	if (hThread == NULL)
+	{
+		printf("CreateRemoteThread - Error!\n");
+		return 1;
+	}
+	else
+	{
+		printf("CreateRemoteThread - handle thread = %p\n", hThread);
+	}
+
+	VirtualFreeEx(hProcess, lpmem, 0, MEM_RELEASE);
+	CloseHandle(hThread);
+	CloseHandle(hProcess);
 
 	return 0;
 }
